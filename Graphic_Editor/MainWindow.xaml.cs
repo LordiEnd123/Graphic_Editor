@@ -12,14 +12,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using System.Windows;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Shapes;
-
-using System.Windows;
-using System.Windows.Input;
-using System.Windows.Shapes;
 using Graphic_Editor.Tools;
 
 namespace Graphic_Editor
@@ -38,13 +30,13 @@ namespace Graphic_Editor
             InitializeComponent();
         }
 
-        // --- выбор инструментов ---
+        // Выбор инструментов
         private void RectangleButton_Click(object sender, RoutedEventArgs e) => currentTool = ToolType.Rectangle;
         private void EllipseButton_Click(object sender, RoutedEventArgs e) => currentTool = ToolType.Ellipse;
         private void LineButton_Click(object sender, RoutedEventArgs e) => currentTool = ToolType.Line;
         private void PolygonButton_Click(object sender, RoutedEventArgs e) => currentTool = ToolType.Polygon;
 
-        // --- рисование ---
+        // Рисование
         private void Canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             Point pos = e.GetPosition(DrawCanvas);
