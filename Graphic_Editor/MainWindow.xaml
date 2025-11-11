@@ -3,20 +3,42 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Graphic Editor" Height="600" Width="900">
     <Grid>
-        <StackPanel Orientation="Horizontal" Background="#EEE" Height="40" VerticalAlignment="Top">
-            <Button Content="Прямоугольник" Width="120" Margin="5" Click="RectangleButton_Click"/>
-            <Button Content="Эллипс" Width="100" Margin="5" Click="EllipseButton_Click"/>
-            <Button Content="Линия" Width="100" Margin="5" Click="LineButton_Click"/>
-            <Button Content="Многоугольник" Width="120" Margin="5" Click="PolygonButton_Click"/>
+        <StackPanel Orientation="Horizontal" Background="#EEE" Height="38" VerticalAlignment="Top" Margin="0">
+            <Button Content="Прямоуг." Width="80" Margin="3" Click="RectangleButton_Click"/>
+            <Button Content="Эллипс" Width="70" Margin="3" Click="EllipseButton_Click"/>
+            <Button Content="Линия" Width="70" Margin="3" Click="LineButton_Click"/>
+            <Button Content="Многоуг." Width="80" Margin="3" Click="PolygonButton_Click"/>
+            <Button Content="Выбор" Width="70" Margin="3" Click="SelectButton_Click"/>
+            <Button Content="Удалить" Width="70" Margin="3" Click="DeleteButton_Click"/>
+
+            <!-- 🎨 Цвет обводки -->
+            <ComboBox x:Name="StrokeColorPicker" Width="90" Margin="3" FontSize="11">
+                <ComboBoxItem Content="Чёрный" Tag="Black" IsSelected="True"/>
+                <ComboBoxItem Content="Красный" Tag="Red"/>
+                <ComboBoxItem Content="Синий" Tag="Blue"/>
+                <ComboBoxItem Content="Зелёный" Tag="Green"/>
+                <ComboBoxItem Content="Фиолетовый" Tag="Purple"/>
+            </ComboBox>
+
+            <ComboBox x:Name="FillColorPicker" Width="90" Margin="3" FontSize="11">
+                <ComboBoxItem Content="Без заливки" Tag="Transparent" IsSelected="True"/>
+                <ComboBoxItem Content="Жёлтый" Tag="Yellow"/>
+                <ComboBoxItem Content="Оранжевый" Tag="Orange"/>
+                <ComboBoxItem Content="Голубой" Tag="LightBlue"/>
+                <ComboBoxItem Content="Серый" Tag="Gray"/>
+            </ComboBox>
+
+
+            <Button Content="Цвет" Width="65" Margin="3" FontSize="11" Click="ApplyColor_Click"/>
         </StackPanel>
 
         <Canvas x:Name="DrawCanvas"
                 Background="White"
-                Margin="0,40,0,0"
+                Margin="0,38,0,0"
                 MouseLeftButtonDown="Canvas_MouseLeftButtonDown"
                 MouseMove="Canvas_MouseMove"
                 MouseLeftButtonUp="Canvas_MouseLeftButtonUp"
-                MouseRightButtonDown="Canvas_MouseRightButtonDown"/>
-        
+                MouseRightButtonDown="Canvas_MouseRightButtonDown"
+                MouseWheel="DrawCanvas_MouseWheel"/>
     </Grid>
 </Window>

@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
@@ -64,7 +64,6 @@ namespace Graphic_Editor.Tools
         public void Finish(Canvas canvas)
         {
             if (points.Count < 3) return;
-
             if (previewLine != null)
             {
                 canvas.Children.Remove(previewLine);
@@ -81,6 +80,10 @@ namespace Graphic_Editor.Tools
             foreach (var p in points)
                 polygon.Points.Add(p);
 
+            var linesToRemove = canvas.Children.OfType<Line>().Where(l => l.Stroke == Brushes.Purple && l.StrokeThickness == 2).ToList();
+
+            foreach (var l in linesToRemove)
+                canvas.Children.Remove(l);
             canvas.Children.Add(polygon);
             points.Clear();
         }

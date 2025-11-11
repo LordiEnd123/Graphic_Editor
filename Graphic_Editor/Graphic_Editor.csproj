@@ -58,6 +58,7 @@
     <Compile Include="Tools\DrawUtils.cs" />
     <Compile Include="Tools\PolygonDrawer.cs" />
     <Compile Include="Tools\ShapeDrawer.cs" />
+    <Compile Include="Tools\ShapeEditor.cs" />
     <Compile Include="Tools\ToolType.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
