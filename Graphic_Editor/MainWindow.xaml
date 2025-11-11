@@ -7,6 +7,7 @@
             <Button Content="Прямоугольник" Width="120" Margin="5" Click="RectangleButton_Click"/>
             <Button Content="Эллипс" Width="100" Margin="5" Click="EllipseButton_Click"/>
             <Button Content="Линия" Width="100" Margin="5" Click="LineButton_Click"/>
+            <Button Content="Многоугольник" Width="120" Margin="5" Click="PolygonButton_Click"/>
         </StackPanel>
 
         <Canvas x:Name="DrawCanvas"
@@ -14,6 +15,8 @@
                 Margin="0,40,0,0"
                 MouseLeftButtonDown="Canvas_MouseLeftButtonDown"
                 MouseMove="Canvas_MouseMove"
-                MouseLeftButtonUp="Canvas_MouseLeftButtonUp"/>
+                MouseLeftButtonUp="Canvas_MouseLeftButtonUp"
+                MouseRightButtonDown="Canvas_MouseRightButtonDown"/>
+        
     </Grid>
 </Window>
