@@ -9,11 +9,11 @@ namespace Graphic_Editor.Tools
 {
     public class PolygonDrawer
     {
-        private List<Point> points = new List<Point>();
+        private readonly List<Point> points = new List<Point>();
         private Line previewLine;
-
         public bool IsDrawing => points.Count > 0;
-
+        public Brush Stroke { get; set; } = Brushes.Purple;
+        public Brush Fill { get; set; } = Brushes.Transparent;
         public void Start(Point startPoint)
         {
             points.Clear();
@@ -31,8 +31,9 @@ namespace Graphic_Editor.Tools
                     Y1 = last.Y,
                     X2 = nextPoint.X,
                     Y2 = nextPoint.Y,
-                    Stroke = Brushes.Purple,
-                    StrokeThickness = 2
+                    Stroke = Stroke,
+                    StrokeThickness = 2,
+                    IsHitTestVisible = false
                 };
                 canvas.Children.Add(edge);
             }
@@ -48,13 +49,13 @@ namespace Graphic_Editor.Tools
             {
                 previewLine = new Line
                 {
-                    Stroke = Brushes.Gray,
+                    Stroke = Stroke,
                     StrokeDashArray = new DoubleCollection { 2 },
-                    StrokeThickness = 1
+                    StrokeThickness = 1,
+                    IsHitTestVisible = false
                 };
                 canvas.Children.Add(previewLine);
             }
-
             previewLine.X1 = last.X;
             previewLine.Y1 = last.Y;
             previewLine.X2 = mousePos.X;
@@ -63,29 +64,58 @@ namespace Graphic_Editor.Tools
 
         public void Finish(Canvas canvas)
         {
-            if (points.Count < 3) return;
+            if (points.Count < 3)
+            {
+                points.Clear();
+                return;
+            }
+
             if (previewLine != null)
             {
                 canvas.Children.Remove(previewLine);
                 previewLine = null;
             }
 
+            var tempLines = canvas.Children.OfType<Line>().Where(l => !l.IsHitTestVisible).ToList();
+
+            foreach (var line in tempLines)
+                canvas.Children.Remove(line);
+
+            // Создаём финальную фигуру
             Polygon polygon = new Polygon
             {
-                Stroke = Brushes.Purple,
+                Stroke = Stroke,
                 StrokeThickness = 2,
-                Fill = Brushes.Transparent
+                Fill = Fill,
+                IsHitTestVisible = true
             };
 
             foreach (var p in points)
                 polygon.Points.Add(p);
 
-            var linesToRemove = canvas.Children.OfType<Line>().Where(l => l.Stroke == Brushes.Purple && l.StrokeThickness == 2).ToList();
-
-            foreach (var l in linesToRemove)
-                canvas.Children.Remove(l);
             canvas.Children.Add(polygon);
+
+            if (canvas.Tag is ActionHistory history)
+                history.SaveState(canvas);
+
             points.Clear();
+
         }
+
+        public void Cancel(Canvas canvas)
+        {
+            points.Clear();
+
+            if (previewLine != null)
+            {
+                canvas.Children.Remove(previewLine);
+                previewLine = null;
+            }
+
+            var tempLines = canvas.Children.OfType<Line>().Where(l => !l.IsHitTestVisible).ToList();
+            foreach (var line in tempLines)
+                canvas.Children.Remove(line);
+        }
+
     }
 }

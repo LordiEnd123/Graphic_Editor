@@ -55,8 +55,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Tools\DrawUtils.cs" />
+    <Compile Include="Tools\ActionHistory.cs" />
     <Compile Include="Tools\PolygonDrawer.cs" />
+    <Compile Include="Tools\SaveLoadFile.cs" />
     <Compile Include="Tools\ShapeDrawer.cs" />
     <Compile Include="Tools\ShapeEditor.cs" />
     <Compile Include="Tools\ToolType.cs" />

@@ -27,15 +27,38 @@ namespace Graphic_Editor
 
         private readonly ShapeEditor shapeEditor = new ShapeEditor();
 
+        private readonly ActionHistory history = new ActionHistory();
+
         public MainWindow()
         {
             InitializeComponent();
+
+            DrawCanvas.Tag = history;
+            this.KeyDown += (s, e) =>
+            {
+                if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.Z)
+                {
+                    history.Undo(DrawCanvas);
+                }
+            };
         }
 
         // Выбор инструментов
-        private void RectangleButton_Click(object sender, RoutedEventArgs e) => currentTool = ToolType.Rectangle;
-        private void EllipseButton_Click(object sender, RoutedEventArgs e) => currentTool = ToolType.Ellipse;
-        private void LineButton_Click(object sender, RoutedEventArgs e) => currentTool = ToolType.Line;
+        private void RectangleButton_Click(object sender, RoutedEventArgs e)
+        {
+            polygonDrawer.Cancel(DrawCanvas);
+            currentTool = ToolType.Rectangle;
+        }
+        private void EllipseButton_Click(object sender, RoutedEventArgs e)
+        {
+            polygonDrawer.Cancel(DrawCanvas);
+            currentTool = ToolType.Ellipse;
+        }
+        private void LineButton_Click(object sender, RoutedEventArgs e)
+        {
+            polygonDrawer.Cancel(DrawCanvas);
+            currentTool = ToolType.Line;
+        }
         private void PolygonButton_Click(object sender, RoutedEventArgs e) => currentTool = ToolType.Polygon;
 
         private (Brush stroke, Brush fill) GetSelectedColors()
@@ -56,6 +79,7 @@ namespace Graphic_Editor
         private void Canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             Point pos = e.GetPosition(DrawCanvas);
+            var (stroke, fill) = GetSelectedColors();
 
             if (currentTool == ToolType.None)
             {
@@ -66,6 +90,9 @@ namespace Graphic_Editor
 
             if (currentTool == ToolType.Polygon)
             {
+                polygonDrawer.Stroke = stroke;
+                polygonDrawer.Fill = fill;
+
                 if (!polygonDrawer.IsDrawing)
                     polygonDrawer.Start(pos);
                 else
@@ -73,11 +100,12 @@ namespace Graphic_Editor
                 return;
             }
 
+
             if (currentTool == ToolType.None)
                 return;
 
             startPoint = pos;
-            var (stroke, fill) = GetSelectedColors();
+
             currentShape = shapeDrawer.CreateShape(currentTool, startPoint);
 
             if (currentShape != null)
@@ -85,10 +113,10 @@ namespace Graphic_Editor
                 currentShape.Stroke = stroke;
                 currentShape.Fill = currentShape is Line ? Brushes.Transparent : fill;
                 DrawCanvas.Children.Add(currentShape);
+                history.SaveState(DrawCanvas);
             }
 
         }
-
 
         private void Canvas_MouseMove(object sender, MouseEventArgs e)
         {
@@ -120,6 +148,8 @@ namespace Graphic_Editor
                 return;
             }
 
+            history.SaveState(DrawCanvas);
+
             // Получаем выбранные цвета
             string strokeColor = ((ComboBoxItem)StrokeColorPicker.SelectedItem).Tag.ToString();
             string fillColor = ((ComboBoxItem)FillColorPicker.SelectedItem).Tag.ToString();
@@ -130,11 +160,13 @@ namespace Graphic_Editor
             shapeEditor.ApplyColor(stroke, fill);
         }
 
-
         private void Canvas_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (currentTool == ToolType.Polygon)
+            {
                 polygonDrawer.Finish(DrawCanvas);
+                history.SaveState(DrawCanvas);
+            }
         }
 
         private void Canvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -145,22 +177,60 @@ namespace Graphic_Editor
 
         private void SelectButton_Click(object sender, RoutedEventArgs e)
         {
+            polygonDrawer.Cancel(DrawCanvas);
             currentTool = ToolType.None;
         }
 
+        private double zoom = 1.0;
+        private const double MinZoom = 0.3;
+        private const double MaxZoom = 5.0;
+
         private void DrawCanvas_MouseWheel(object sender, MouseWheelEventArgs e)
         {
-            if (currentTool == ToolType.None)
+            // Масштаб фигуры
+            if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
             {
                 shapeEditor.ScaleShape(e);
+                e.Handled = true;
+                return;
             }
+
+            // Масштабируем весь холст
+            double scale = e.Delta > 0 ? 1.1 : 0.9;
+            double newZoom = zoom * scale;
+            if (newZoom < MinZoom || newZoom > MaxZoom)
+                return;
+    
+            zoom = newZoom;
+            DrawCanvas.LayoutTransform = new ScaleTransform(zoom, zoom);
+
+            e.Handled = true;
         }
 
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
+            polygonDrawer.Cancel(DrawCanvas);
+            history.SaveState(DrawCanvas);
             shapeEditor.DeleteSelected(DrawCanvas);
         }
 
+        private void UndoButton_Click(object sender, RoutedEventArgs e)
+        {
+            polygonDrawer.Cancel(DrawCanvas);
+            history.Undo(DrawCanvas);
+        }
+
+        private void SaveProject_Click(object sender, RoutedEventArgs e)
+        {
+            polygonDrawer.Cancel(DrawCanvas);
+            SaveLoadFile.Save(DrawCanvas);
+        }
+
+        private void LoadProject_Click(object sender, RoutedEventArgs e)
+        {
+            polygonDrawer.Cancel(DrawCanvas);
+            SaveLoadFile.Load(DrawCanvas);
+        }
 
     }
 }

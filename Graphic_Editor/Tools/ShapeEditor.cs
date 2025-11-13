@@ -35,6 +35,9 @@ namespace Graphic_Editor.Tools
             var shape = e.OriginalSource as Shape;
             if (shape != null && canvas.Children.Contains(shape))
             {
+                if (canvas.Tag is ActionHistory history)
+                    history.SaveState(canvas);
+
                 if (selectedShape != null)
                 {
                     selectedShape.StrokeThickness = 2;
@@ -160,7 +163,7 @@ namespace Graphic_Editor.Tools
             }
         }
 
-
+        // Удаление
         public void DeleteSelected(Canvas canvas)
         {
             if (selectedShape != null)
